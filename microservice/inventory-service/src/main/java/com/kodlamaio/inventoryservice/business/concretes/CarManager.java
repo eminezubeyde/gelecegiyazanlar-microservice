@@ -33,7 +33,7 @@ public class CarManager implements CarService {
 
     @Override
     public List<GetAllCarsResponse> getAll() {
-        var cars = repository.findAll();
+        List<Car> cars = repository.findAll();
         var response = cars
                 .stream()
                 .map(car -> mapper.forResponse().map(car, GetAllCarsResponse.class))

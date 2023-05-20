@@ -19,12 +19,8 @@ public class InventoryProducer {
 
     public void sendMessage(CarCreatedEvent event) {
         log.info(String.format("car-created event => %s", event.toString()));
-        Message<CarCreatedEvent> message = MessageBuilder
-                .withPayload(event)
-                .setHeader(KafkaHeaders.TOPIC, "car-created")
-                .build();
+        kafkaTemplate.send("car-created",event);
 
-        kafkaTemplate.send(message);
     }
 
     public void sendMessage(CarDeletedEvent event) {
