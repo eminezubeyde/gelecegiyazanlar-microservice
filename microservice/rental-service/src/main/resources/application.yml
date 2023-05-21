@@ -1,6 +1,6 @@
 spring:
   application:
-    name:RENTAL-SERVICE
+    name: RENTAL-SERVICE
   datasource:
     username: postgres
     password: '12345'

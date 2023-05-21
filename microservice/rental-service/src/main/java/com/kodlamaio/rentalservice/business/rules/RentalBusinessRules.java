@@ -4,6 +4,7 @@ import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.rentalservice.api.clients.CarClient;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -12,7 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RentalBusinessRules {
     private final RentalRepository repository;
-    private final CarClient client;
+    @Qualifier("com.kodlamaio.rentalservice.api.clients.CarClient")
+    private final CarClient carClient;
 
     public void checkIfRentalExists(UUID id) {
         if (!repository.existsById(id)) {
@@ -21,7 +23,7 @@ public class RentalBusinessRules {
     }
 
     public void ensureCarIsAvailable(UUID carId) {
-        var response = client.checkIfCarAvailable(carId);
+        var response = carClient.checkIfCarAvailable(carId);
         if (!response.isSuccess()) {
             throw new BusinessException(response.getMessage());
         }
