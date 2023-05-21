@@ -93,4 +93,5 @@ public class RentalManager implements RentalService {
         var carId = repository.findById(id).orElseThrow().getCarId();
         producer.sendMessage(new RentalDeletedEvent(carId), "rental-deleted");
     }
+
 }
