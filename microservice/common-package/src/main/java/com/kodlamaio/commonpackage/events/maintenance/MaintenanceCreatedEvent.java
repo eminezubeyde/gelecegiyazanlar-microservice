@@ -14,9 +14,4 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MaintenanceCreatedEvent implements Event {
     private UUID carId;
-    private String carId2;
-
-    public MaintenanceCreatedEvent(String carId2) {
-        this.carId2 = carId2;
-    }
 }

@@ -9,10 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class MaintenanceConsumer {
     private final CarService service;
@@ -44,6 +45,6 @@ public class MaintenanceConsumer {
     public void consume(MaintenanceCompletedEvent event) {
         //change car state
         service.changeStateByCarId(State.Available, event.getCarId());
-        log.info("maintenance deleted event completed {}", event);
+        log.info("maintenance event completed {}", event);
     }
 }

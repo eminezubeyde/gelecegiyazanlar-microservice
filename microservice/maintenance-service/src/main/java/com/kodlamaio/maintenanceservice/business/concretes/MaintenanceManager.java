@@ -120,7 +120,7 @@ public class MaintenanceManager implements MaintenanceService {
     }
 
     private void sendKafkaMaintenanceCreatedEvent(UUID id) {
-        producer.sendMessage(new MaintenanceCreatedEvent(id.toString()), "maintenance-created");
+        producer.sendMessage(new MaintenanceCreatedEvent(id), "maintenance-created");
     }
 
     private void sendKafkaMaintenanceCompletedEvent(UUID id) {
