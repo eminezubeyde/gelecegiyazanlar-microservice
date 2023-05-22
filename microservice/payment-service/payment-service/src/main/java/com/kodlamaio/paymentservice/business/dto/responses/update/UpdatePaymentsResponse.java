@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdatePaymentResponse {
+public class UpdatePaymentsResponse {
     private UUID id;
     private String cardNumber;
     private String cardHolder;

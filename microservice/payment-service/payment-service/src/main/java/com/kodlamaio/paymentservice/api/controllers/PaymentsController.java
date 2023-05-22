@@ -8,7 +8,7 @@ import com.kodlamaio.paymentservice.business.dto.requests.update.UpdatePaymentRe
 import com.kodlamaio.paymentservice.business.dto.responses.create.CreatePaymentResponse;
 import com.kodlamaio.paymentservice.business.dto.responses.get.GetAllPaymentsResponse;
 import com.kodlamaio.paymentservice.business.dto.responses.get.GetPaymentResponse;
-import com.kodlamaio.paymentservice.business.dto.responses.update.UpdatePaymentResponse;
+import com.kodlamaio.paymentservice.business.dto.responses.update.UpdatePaymentsResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +39,7 @@ public class PaymentsController {
     }
 
     @PutMapping("/{id}")
-    public UpdatePaymentResponse update(@PathVariable UUID id, @Valid @RequestBody UpdatePaymentRequest request) {
+    public UpdatePaymentsResponse update(@PathVariable UUID id, @Valid @RequestBody UpdatePaymentRequest request) {
         return service.update(id, request);
     }
 
