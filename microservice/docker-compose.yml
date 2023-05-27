@@ -16,6 +16,14 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  mongodb2:
+    container_name: turkcell-invoicedb
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb2_data:/data/db
+
   mysqldb:
     container_name: maintenance-db
     environment:
@@ -29,7 +37,9 @@ services:
       - mysqldb_data:/data/db
 
 
+
 volumes:
   kafka_data:
   mongodb_data:
   mysqldb_data:
+  mongodb2_data:

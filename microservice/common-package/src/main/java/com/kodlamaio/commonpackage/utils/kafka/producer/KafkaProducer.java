@@ -15,7 +15,7 @@ import org.springframework.messaging.support.MessageBuilder;
 public class KafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public <T extends Event> void sendMessage(T event, String topic) {
+    public <T extends Event> void  sendMessage(T event, String topic) {
         log.info(String.format("%s event => %s", topic, event.toString()));
         Message<T> message = MessageBuilder
                 .withPayload(event)

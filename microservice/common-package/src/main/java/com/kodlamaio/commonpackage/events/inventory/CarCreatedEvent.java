@@ -19,7 +19,7 @@ public class CarCreatedEvent implements Event {
     private String modelName;
     private String brandName;
     private String plate;
-    private int modelYear;
+    private String modelYear;
     private double dailyPrice;
     private String state;
 }

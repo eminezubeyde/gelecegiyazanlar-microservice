@@ -1,5 +1,6 @@
 package com.kodlamaio.inventoryservice.api.controllers;
 
+import com.kodlamaio.commonpackage.utils.dto.CarClientResponse;
 import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.dto.requests.create.CreateCarRequest;
@@ -52,5 +53,10 @@ public class CarsController {
     @GetMapping("/check-car-available/{id}")
     public ClientResponse checkIfCarAvailable(@PathVariable UUID id) {
         return service.checkIfCarAvailable(id);
+    }
+    @GetMapping("/check-car-available/{id}")
+    public CarClientResponse getByIdForInvoice(@PathVariable UUID id)
+    {
+        return service.getByIdForInvoice(id);
     }
 }

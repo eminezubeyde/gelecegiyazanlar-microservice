@@ -1,5 +1,6 @@
 package com.kodlamaio.rentalservice.business.dto.requests;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,7 @@ public class CreateRentalRequest {
     private double dailyPrice;
     @Min(1)
     private int rentedForDays;
-    // TODO: Credit Card Information
+    private CreateRentalPaymentRequest paymentRequest;
+    //TODO: Card Information
+
 }

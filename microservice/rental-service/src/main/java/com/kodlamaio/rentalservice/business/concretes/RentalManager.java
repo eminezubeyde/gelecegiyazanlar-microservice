@@ -1,9 +1,14 @@
 package com.kodlamaio.rentalservice.business.concretes;
 
+import com.kodlamaio.commonpackage.events.inventory.CarCreatedEvent;
 import com.kodlamaio.commonpackage.events.rental.RentalCreatedEvent;
 import com.kodlamaio.commonpackage.events.rental.RentalDeletedEvent;
+import com.kodlamaio.commonpackage.events.rental.RentalInvoiceCreatedEvent;
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
+import com.kodlamaio.rentalservice.api.clients.CarClient;
+import com.kodlamaio.rentalservice.api.clients.PaymentClient;
 import com.kodlamaio.rentalservice.business.abstracts.RentalService;
 import com.kodlamaio.rentalservice.business.dto.requests.CreateRentalRequest;
 import com.kodlamaio.rentalservice.business.dto.requests.UpdateRentalRequest;
@@ -15,9 +20,11 @@ import com.kodlamaio.rentalservice.business.rules.RentalBusinessRules;
 import com.kodlamaio.rentalservice.entities.Rental;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +35,10 @@ public class RentalManager implements RentalService {
     private final ModelMapperService mapper;
     private final RentalBusinessRules rules;
     private final KafkaProducer producer;
+    @Qualifier("com.kodlamaio.rentalservice.api.clients.PaymentClient")
+    private final PaymentClient paymentClient;
+    @Qualifier("com.kodlamaio.rentalservice.api.clients.CarClient")
+    private final CarClient carClient;
 
     @Override
     public List<GetAllRentalsResponse> getAll() {
@@ -55,13 +66,28 @@ public class RentalManager implements RentalService {
         var rental = mapper.forRequest().map(request, Rental.class);
         rental.setId(null);
         rental.setTotalPrice(getTotalPrice(rental));
-        rental.setRentedAt(LocalDate.now());
+        rental.setRentedAt(LocalDateTime.now());
+
+        //payment
+        CreateRentalPaymentRequest paymentRequest = new CreateRentalPaymentRequest();
+        mapper.forRequest().map(request.getPaymentRequest(), paymentRequest);
+        paymentRequest.setPrice(getTotalPrice(rental));
+        paymentClient.processRentalPayment(paymentRequest);
+
         repository.save(rental);
         sendKafkaRentalCreatedEvent(request.getCarId());
         var response = mapper.forResponse().map(rental, CreateRentalResponse.class);
 
+        //invoice
+        RentalInvoiceCreatedEvent event = new RentalInvoiceCreatedEvent();
+        createInvoiceRequest(request, event, rental);
+        sendKafkaRentalInvoiceCreatedEvent(event);
+
         return response;
     }
+
+
+
 
     @Override
     public UpdateRentalResponse update(UUID id, UpdateRentalRequest request) {
@@ -93,5 +119,20 @@ public class RentalManager implements RentalService {
         var carId = repository.findById(id).orElseThrow().getCarId();
         producer.sendMessage(new RentalDeletedEvent(carId), "rental-deleted");
     }
+    private void sendKafkaRentalInvoiceCreatedEvent(RentalInvoiceCreatedEvent event) {
+        producer.sendMessage(event, "rental-invoice-created");
+    }
+    private void createInvoiceRequest(CreateRentalRequest createRentalRequest, RentalInvoiceCreatedEvent invoiceRequest, Rental rental) {
 
+        CarCreatedEvent car = carClient.getById(rental.getCarId());
+
+        invoiceRequest.setRentedAt(rental.getRentedAt());
+        invoiceRequest.setModelName(car.getModelName());
+        invoiceRequest.setBrandName(car.getBrandName());
+        invoiceRequest.setDailyPrice(rental.getDailyPrice());
+        invoiceRequest.setPlate(car.getPlate());
+        invoiceRequest.setCardHolder(createRentalRequest.getPaymentRequest().getCardHolder());
+        invoiceRequest.setModelYear(car.getModelYear());
+        invoiceRequest.setRentedForDays(rental.getRentedForDays());
+    }
 }
